@@ -557,9 +557,11 @@ fuse_mount_core(const char *mountpoint, struct mount_opts *mopts,
 		if (mopts->namedattr) {
 			argv[a++] = "--namedattr=true";
 		}
-		if (mopts->noattrcache) {
-			argv[a++] = "--attrcache=false";
-		}
+		/* FUSE-T's NFS attribute cache can cause stale file metadata
+		 * after rapid rename/stat sequences. Always disable it for
+		 * correctness — the performance impact is negligible for
+		 * build system use cases. */
+		argv[a++] = "--attrcache=false";
 		if (mopts->rwsize) {
 			sprintf(rwsize_str, "--rwsize=%d", mopts->rwsize);
 			argv[a++] = rwsize_str;
